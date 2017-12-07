@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="mirimmedialab.co.kr.mboxcamera" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<name>mBOXCamera</name>
+<js-module name="mBOXCamera" src="www/mBOXCamera.js">
+<clobbers target="cordova.plugins.mBOXCamera" />
+</js-module>
+<platform name="android">
+
+
+
+<config-file parent="/*" target="res/xml/config.xml">
+<feature name="mBOXCamera"><param name="android-package" value="mirimmedialab.co.kr.mboxcamera.mBOXCamera" />
+</feature>
+</config-file>
+
+<config-file parent="/*" target="AndroidManifest.xml">
+</config-file>
+<source-file src="src/android/mBOXCamera.java" target-dir="src/mirimmedialab/co/kr/mboxcamera" />
+
+
+
+<config-file target="AndroidManifest.xml" parent="/manifest/application">
+    <activity android:name="mirimmedialab.co.kr.mboxcamera.cls.MainActivity"
+            android:screenOrientation="portrait" android:theme="@style/Theme.Demo"></activity>
+</config-file>
+
+<config-file target="AndroidManifest.xml" parent="/manifest/application">
+    <activity android:name="mirimmedialab.co.kr.mboxcamera.cls.ResultImgView" android:screenOrientation="portrait" android:theme="@style/Theme.Demo"></activity>
+</config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-feature android:name="android.hardware.camera2"/>
+    <uses-feature android:name="android.hardware.camera"/>
+    </config-file>
+
+<source-file src="src/android/cls/MainActivity.java" target-dir="src/mirimmedialab/co/kr/mboxcamera/cls" />
+<source-file src="src/android/cls/AspectRatioFragment.java" target-dir="src/mirimmedialab/co/kr/mboxcamera/cls" />
+<source-file src="src/android/cls/ResultImgView.java" target-dir="src/mirimmedialab/co/kr/mboxcamera/cls" />
+
+<source-file src="src/android/res/drawable/ic_aspect_ratio.xml" target-dir="res/drawable" />
+<source-file src="src/android/res/drawable/ic_camera.xml" target-dir="res/drawable" />
+<source-file src="src/android/res/drawable/ic_flash_auto.xml" target-dir="res/drawable" />
+<source-file src="src/android/res/drawable/ic_flash_off.xml" target-dir="res/drawable" />
+<source-file src="src/android/res/drawable/ic_flash_on.xml" target-dir="res/drawable" />
+<source-file src="src/android/res/drawable/ic_switch_camera.xml" target-dir="res/drawable" />
+
+<source-file src="src/android/res/layout/activity_result_img_view.xml" target-dir="res/layout" />
+<source-file src="src/android/res/layout/mirim_camera.xml" target-dir="res/layout" />
+
+<source-file src="src/android/res/menu/main.xml" target-dir="res/menu" />
+
+<source-file src="src/android/res/mipmap/ic_launcher_round.png" target-dir="res/mipmap" />
+<source-file src="src/android/res/mipmap/ic_launcher.png" target-dir="res/mipmap" />
+
+<source-file src="src/android/res/values/colors.xml" target-dir="res/values" />
+<source-file src="src/android/res/values/strings.xml.back" target-dir="res/values" />
+<source-file src="src/android/res/values/styles.xml" target-dir="res/values" />
+
+</platform>
+<framework  src="com.android.support:design:+"/>
+<framework  src="com.squareup.picasso:picasso:2.5.2"/>
+<framework  src="com.github.eunseokOh:googleCamera:master-SNAPSHOT"/>
+
+
+
+</plugin>
