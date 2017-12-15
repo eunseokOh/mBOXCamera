@@ -20,13 +20,16 @@
         android:icon="@drawable/ic_aspect_ratio"
         android:title="@string/aspect_ratio"
         app:showAsAction="ifRoom"
+        android:visible="false"
         />
 
     <item
         android:id="@+id/switch_flash"
         android:icon="@drawable/ic_flash_auto"
         android:title="@string/flash_auto"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        />
 
     <item
         android:id="@+id/switch_camera"

@@ -16,7 +16,6 @@
 
 package mirimmedialab.co.kr.mboxcamera.cls;
 
-import org.json.JSONArray;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -25,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -39,16 +39,21 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -74,7 +79,8 @@ public class MainActivity extends AppCompatActivity implements
     private  final int REQUEST_CAMERA_PERMISSION = 1;
     String backImgURI = null;
     private  final String FRAGMENT_DIALOG = "dialog";
-
+    Toast toast = null;
+    CountDownTimer toastTimer = null;
     private final  int[] FLASH_OPTIONS = {
             CameraView.FLASH_AUTO,
             CameraView.FLASH_OFF,
@@ -109,10 +115,12 @@ public class MainActivity extends AppCompatActivity implements
 
 
     public void setFullScreen() {
+        
         decorView = getWindow().getDecorView();
         uiOption = getWindow().getDecorView().getSystemUiVisibility();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            uiOption |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+
+            //uiOption |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             uiOption |= View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -171,6 +179,20 @@ public class MainActivity extends AppCompatActivity implements
         mCameraView.post(new Runnable() {
             @Override
             public void run() {
+                toast =  Toast.makeText(getApplicationContext(), "화면을 터치하세요", Toast.LENGTH_SHORT);
+                ViewGroup group = (ViewGroup) toast.getView();
+                TextView messageTextView = (TextView) group.getChildAt(0);
+                messageTextView.setTextSize(17);
+                toast.setGravity(Gravity.TOP, 0, 0);
+                toast.show();
+                toastTimer = new CountDownTimer(5000, 1000)
+                {
+
+                    public void onTick(long millisUntilFinished) {toast.show();}
+                    public void onFinish() {toast.show(); toastTimer.cancel(); toastTimer = null;}
+
+                }.start();
+
                 Iterator<AspectRatio> aspectIterator = mCameraView.getSupportedAspectRatios().iterator();
                 while(aspectIterator.hasNext()){
                     AspectRatio tmpAspect = aspectIterator.next();
@@ -280,6 +302,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+          if(toastTimer != null){
+            toastTimer.cancel();
+        }
+        if(toast != null){
+            toast.cancel();
+
+        }
+
         if (mBackgroundHandler != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 mBackgroundHandler.getLooper().quitSafely();
@@ -503,8 +533,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
             //Log.d(TAG, "onPictureTaken " + fileData.length);
-            Toast.makeText(cameraView.getContext(), findResources("string","picture_taken") , Toast.LENGTH_SHORT)
-                    .show();
+   
 
 //            final Bitmap bm = Bitmap.createBitmap(640, 360, Bitmap.Config.RGB_565);
 //            bm.copyPixelsFromBuffer(ByteBuffer.wrap(data));

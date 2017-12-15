@@ -16,25 +16,25 @@
 
 package mirimmedialab.co.kr.mboxcamera.cls;
 
-import android.Manifest;
+
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -73,7 +73,7 @@ public class ResultImgView extends Activity {
         fLayout = (FrameLayout) findViewById( findResources("id","fLayout"));
         setFullScreen();
         Intent intent = getIntent();
-        final int facing = Integer.parseInt(intent.getExtras().get("facing").toString());
+        //final int facing = Integer.parseInt(intent.getExtras().get("facing").toString());
         imgFile = (File) intent.getExtras().get("imgFile");
 
         ImageView backImg = (ImageView) findViewById(findResources("id","backImg") );
@@ -82,7 +82,7 @@ public class ResultImgView extends Activity {
             @Override
             public void run() {
 
-                viewTakeImage(imgFile, facing);
+                viewTakeImage(imgFile);
             }
         });
 
@@ -96,20 +96,51 @@ public class ResultImgView extends Activity {
 
 
 
-    private void viewTakeImage(File imgFile, int facing){
-        cBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        Matrix matrix = new Matrix();
-        if(facing == 1){
-            matrix.postRotate(-90);
-        }else{
-            matrix.postRotate(90);
-
-        }
+    private void viewTakeImage(File imgFile){
         Display mDisplay = this.getWindowManager().getDefaultDisplay();
         final int width  = mDisplay.getWidth();
         final int height = mDisplay.getHeight();
-        Bitmap rotatedBitmap = Bitmap.createBitmap(cBitmap , 0, 0, cBitmap .getWidth(), cBitmap .getHeight(), matrix, true);
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap,width,height,true);
+        Matrix matrix = null;
+        try{
+            ExifInterface exif = new ExifInterface(imgFile.getAbsolutePath());
+
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+
+            matrix = new Matrix();
+            if (orientation == 6) {
+                matrix.postRotate(90);
+            }
+            else if (orientation == 3) {
+                matrix.postRotate(180);
+            }
+            else if (orientation == 8) {
+                matrix.postRotate(270);
+            }
+
+
+            Log.d("orientation is : ", orientation+"");
+        }catch (Exception e){
+
+        }
+
+
+        //decodeFile(imgFile);
+        cBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+
+        //Log.d("img ori width", width+"");
+//        Log.d("imgWidth : ",cBitmap.getWidth()+"");
+//
+//        if(facing == 1){
+//            matrix.postRotate(-90);
+//        }else{
+//            matrix.postRotate(90);
+//
+//        }
+
+        cBitmap = Bitmap.createBitmap(cBitmap , 0, 0, cBitmap.getWidth(), cBitmap.getHeight(), matrix, true);
+
+        cBitmap = Bitmap.createScaledBitmap(cBitmap,width,height,true);
 
 
         imgFile.delete();
@@ -123,7 +154,8 @@ public class ResultImgView extends Activity {
 
 
 
-        myImage.setImageBitmap(scaledBitmap);
+        myImage.setImageBitmap(cBitmap);
+
         saveImageFile();
 
 
@@ -166,6 +198,8 @@ public class ResultImgView extends Activity {
 
             if(sendFile.exists()){
                 this.sendBroadcast(new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(sendFile)) );
+                Toast.makeText(getApplicationContext(), "이미지가 저장되었습니다." , Toast.LENGTH_SHORT)
+                        .show();
             }
 
 
@@ -194,10 +228,12 @@ public class ResultImgView extends Activity {
     }
 
     public void setFullScreen() {
+
         decorView = getWindow().getDecorView();
         uiOption = getWindow().getDecorView().getSystemUiVisibility();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            uiOption |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+
+            //uiOption |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             uiOption |= View.SYSTEM_UI_FLAG_FULLSCREEN;
